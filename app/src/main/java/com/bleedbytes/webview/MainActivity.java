@@ -1,5 +1,6 @@
 package com.bleedbytes.webview;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity
     private WebView mWebview;
     ProgressBar bar;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        //noinspection deprecation
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -60,6 +63,19 @@ public class MainActivity extends AppCompatActivity
         mWebview.setWebViewClient(new myViewClient());
         //progress bar
         bar=(ProgressBar) findViewById(R.id.progressBar1);
+
+        //performance
+        //noinspection deprecation
+        mWebview.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        mWebview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK); //only loads cache when network available
+        mWebview.getSettings().setAppCacheEnabled(true);
+        mWebview.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+        //noinspection deprecation
+        webSettings.setEnableSmoothTransition(true);
+//end of performance tweaks
 
     }
 
@@ -166,6 +182,7 @@ public class MainActivity extends AppCompatActivity
             super.onPageStarted(view, url, favicon);
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
