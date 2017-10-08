@@ -3,8 +3,9 @@ package com.bleedbytes.webview;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+//import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,6 +20,11 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+//onesignal
+import com.onesignal.OSNotificationOpenResult;
+import com.onesignal.OneSignal;
+//json
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -31,6 +37,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //
+        //onesignal
+        OneSignal.startInit(this)
+                    .setNotificationOpenedHandler(new ExampleNotificationOpenedHandler())
+                .init();
+
+/* OneSignal.startInit(this)
+        .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+        .unsubscribeWhenNotificationsAreDisabled(true)
+        .init();*/
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -179,6 +196,30 @@ public class MainActivity extends AppCompatActivity
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
             return super.shouldOverrideUrlLoading(view, url);
+        }
+    }
+
+    //onesignal class
+
+    // Fires when a notificaiton is opened by tapping on it or one is received while the app is runnning.
+    private class ExampleNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
+      //  @Override
+        public void notificationOpened(String message, JSONObject additionalData, boolean isActive) {
+            try {
+                if (additionalData != null) {
+                    if (additionalData.has("actionSelected"))
+                        Log.d("OneSignalExample", "OneSignal notification button with id " + additionalData.getString("actionSelected") + " pressed");
+
+                    Log.d("OneSignalExample", "Full additionalData:\n" + additionalData.toString());
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+
+        @Override
+        public void notificationOpened(OSNotificationOpenResult result) {
+
         }
     }
 }
