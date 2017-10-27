@@ -1,10 +1,17 @@
 package com.bleedbytes.webview;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 //import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+//import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -20,11 +27,18 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 //onesignal
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
 //json
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+//admob
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -32,6 +46,12 @@ public class MainActivity extends AppCompatActivity
     //webview intialization
     private WebView mWebview;
     ProgressBar bar;
+    private static String url = "http://bleedbytes.in/appVersion.json";
+    String VersionUpdate;
+
+    //private AdView mAdView; //adview instance
+    private AdView mAdView;
+
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -40,7 +60,7 @@ public class MainActivity extends AppCompatActivity
         //
         //onesignal
         OneSignal.startInit(this)
-                    .setNotificationOpenedHandler(new ExampleNotificationOpenedHandler())
+                .setNotificationOpenedHandler(new ExampleNotificationOpenedHandler())
                 .init();
 
 /* OneSignal.startInit(this)
@@ -64,14 +84,14 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //calling declared webview
-        mWebview=(WebView) findViewById(R.id.myWebview);
+        mWebview = (WebView) findViewById(R.id.myWebview);
         //WebSettings.
-        WebSettings webSettings=mWebview.getSettings();
+        WebSettings webSettings = mWebview.getSettings();
         webSettings.setJavaScriptEnabled(true);
         mWebview.loadUrl("http://bleedbytes.in");
         mWebview.setWebViewClient(new myViewClient());
         //progress bar
-        bar=(ProgressBar) findViewById(R.id.progressBar1);
+        bar = (ProgressBar) findViewById(R.id.progressBar1);
 
         //performance
         //noinspection deprecation
@@ -84,7 +104,13 @@ public class MainActivity extends AppCompatActivity
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
         //noinspection deprecation
         webSettings.setEnableSmoothTransition(true);
-//end of performance tweaks
+        //end of performance tweaks
+
+        //admob
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
 
     }
 
@@ -114,7 +140,12 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //
+            mWebview.reload();
+            bar.setVisibility(View.VISIBLE);
+
             return true;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -122,31 +153,37 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_howto) {
             // Handle the how to section action
             mWebview.loadUrl("http://bleedbytes.in/category/how-to/");
+            bar.setVisibility(View.VISIBLE);
         } else if (id == R.id.nav_geek) {
-        //geek section
+            //geek section
             mWebview.loadUrl("http://bleedbytes.in/category/geek/");
+            bar.setVisibility(View.VISIBLE);
 
         } else if (id == R.id.nav_os) {
             //opensource section
             mWebview.loadUrl("http://bleedbytes.in/category/open-source/");
+            bar.setVisibility(View.VISIBLE);
 
         } else if (id == R.id.nav_tools) {
             //tools section
             mWebview.loadUrl("http://bleedbytes.in/category/tools/");
+            bar.setVisibility(View.VISIBLE);
         } else if (id == R.id.nav_about) {
             //about section
             mWebview.loadUrl("http://bleedbytes.in/about/");
+            bar.setVisibility(View.VISIBLE);
 
         } else if (id == R.id.nav_contact) {
             //contact sectoin
             mWebview.loadUrl("http://bleedbytes.in/contact/");
+            bar.setVisibility(View.VISIBLE);
 
         }
 
@@ -159,31 +196,26 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        if (event.getAction()==KeyEvent.ACTION_DOWN)
-        {
-            switch (keyCode)
-            {
-               case  KeyEvent.KEYCODE_BACK:
-                if(mWebview.canGoBack()){
-                    mWebview.goBack();
-                }
-                else
-                {
-                    finish();
-                }
-                return true;
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_BACK:
+                    if (mWebview.canGoBack()) {
+                        mWebview.goBack();
+                    } else {
+                        finish();
+                    }
+                    return true;
             }
         }
         return super.onKeyDown(keyCode, event);
 
     }
 
-    private class myViewClient extends WebViewClient
-    {
+    private class myViewClient extends WebViewClient {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-            bar.setVisibility(View.GONE);
+            bar.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -203,7 +235,7 @@ public class MainActivity extends AppCompatActivity
 
     // Fires when a notificaiton is opened by tapping on it or one is received while the app is runnning.
     private class ExampleNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
-      //  @Override
+        //  @Override
         public void notificationOpened(String message, JSONObject additionalData, boolean isActive) {
             try {
                 if (additionalData != null) {
@@ -222,4 +254,104 @@ public class MainActivity extends AppCompatActivity
 
         }
     }
+
+
+    class VersionCheck extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            HttpHandler sh = new HttpHandler();
+
+            String jsonStr = sh.makeServiceCall(url);
+
+            if (jsonStr != null) {
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    JSONArray version = jsonObj.getJSONArray("Version");
+                    for (int i = 0; i < version.length(); i++) {
+
+                        JSONObject v = version.getJSONObject(i);
+
+                        VersionUpdate = v.getString("version");
+                    }
+
+
+                } catch (final JSONException e) {
+                    // Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    "Json parsing error: " + e.getMessage(),
+                                    Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    });
+
+                }
+            } else {
+                //Log.e(TAG, "Couldn't get json from server.");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            String VersionName = BuildConfig.VERSION_NAME;
+
+
+            if (VersionUpdate.equals(VersionName)) {
+
+                //Do Nothing
+            } else {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Our App got Update");
+                builder.setIcon(R.mipmap.ic_launcher);
+                builder.setCancelable(false);
+                builder.setMessage("New version available, select update to update our app")
+                        .setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                final String appName = getPackageName();
+
+                                try {
+                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appName)));
+                                } catch (android.content.ActivityNotFoundException anfe) {
+                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + appName)));
+                                }
+
+                                finish();
+
+                            }
+                        });
+
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        }
+
+    }
 }
+

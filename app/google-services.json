@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "89118235406",
+    "firebase_url": "https://bleedbytes-webview-app.firebaseio.com",
+    "project_id": "bleedbytes-webview-app",
+    "storage_bucket": "bleedbytes-webview-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:89118235406:android:e9e52a9a3d321288",
+        "android_client_info": {
+          "package_name": "com.bleedbytes.webview"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "89118235406-1hj9t7sdbhu214q6veq8aiin00btso0s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bleedbytes.webview",
+            "certificate_hash": "641ff7fb62d1c8bbc7d824b3788dfe06ae8db1a2"
+          }
+        },
+        {
+          "client_id": "89118235406-8avsjg1vallfmk5e593dqmru4b5466a0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEF3sTGEuy5FlP8_W-2XLe6qE5z6SdXbs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "89118235406-8avsjg1vallfmk5e593dqmru4b5466a0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

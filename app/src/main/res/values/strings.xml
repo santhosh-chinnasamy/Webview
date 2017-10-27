@@ -4,6 +4,10 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Refresh</string>
     <string name="a_tech_site">A tech site</string>
+
+    ad unit
+    <string name="banner_ad_unit_id">ca-app-pub-7707704402043937/6999838763</string>
+
 </resources>
